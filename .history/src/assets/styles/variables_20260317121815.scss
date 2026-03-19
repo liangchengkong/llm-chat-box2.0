@@ -94,8 +94,6 @@
   }
 }
 
-/* 提高优先级以覆盖嵌套选择器 */
-.markdown-body .code-block.dark-theme,
 .code-block.dark-theme {
   --code-block-bg: #282c34 !important; /* atom-one-dark 的背景色 */
   --code-header-bg: #21252b !important; /* 略深一点的头部背景色 */
@@ -105,39 +103,39 @@
   --code-text: #abb2bf !important;
 
   // 代码高亮颜色（暗色模式 - atom-one-dark）
-  --hljs-comment: #5c6370 !important;
-  --hljs-keyword: #c678dd !important;
-  --hljs-string: #98c379 !important;
-  --hljs-number: #d19a66 !important;
-  --hljs-function: #61afef !important;
-  --hljs-title: #e06c75 !important;
-  --hljs-built_in: #e6c07b !important;
-  --hljs-tag: #e06c75 !important;
-  --hljs-attr: #d19a66 !important;
-  --hljs-value: #98c379 !important;
-  --hljs-selector-tag: #e06c75 !important;
-  --hljs-selector-id: #e06c75 !important;
-  --hljs-selector-class: #e5c07b !important;
-  --hljs-selector-attr: #d19a66 !important;
-  --hljs-selector-pseudo: #56b6c2 !important;
-  --hljs-doctag: #5c6370 !important;
-  --hljs-name: #e06c75 !important;
-  --hljs-regexp: #98c379 !important;
-  --hljs-link: #61afef !important;
-  --hljs-symbol: #e06c75 !important;
-  --hljs-bullet: #d19a66 !important;
-  --hljs-addition: #98c379 !important;
-  --hljs-deletion: #e06c75 !important;
-  --hljs-meta: #5c6370 !important;
-  --hljs-strong: #d19a66 !important;
-  --hljs-emphasis: #d19a66 !important;
-  --hljs-quote: #5c6370 !important;
-  --hljs-literal: #d19a66 !important;
-  --hljs-params: #e06c75 !important;
-  --hljs-property: #56b6c2 !important;
-  --hljs-variable: #d19a66 !important;
-  --hljs-template-tag: #e06c75 !important;
-  --hljs-template-variable: #d19a66 !important;
+  --hljs-comment: #5c6370;
+  --hljs-keyword: #c678dd;
+  --hljs-string: #98c379;
+  --hljs-number: #d19a66;
+  --hljs-function: #61afef;
+  --hljs-title: #e06c75;
+  --hljs-built_in: #e6c07b;
+  --hljs-tag: #e06c75;
+  --hljs-attr: #d19a66;
+  --hljs-value: #98c379;
+  --hljs-selector-tag: #e06c75;
+  --hljs-selector-id: #e06c75;
+  --hljs-selector-class: #e5c07b;
+  --hljs-selector-attr: #d19a66;
+  --hljs-selector-pseudo: #56b6c2;
+  --hljs-doctag: #5c6370;
+  --hljs-name: #e06c75;
+  --hljs-regexp: #98c379;
+  --hljs-link: #61afef;
+  --hljs-symbol: #e06c75;
+  --hljs-bullet: #d19a66;
+  --hljs-addition: #98c379;
+  --hljs-deletion: #e06c75;
+  --hljs-meta: #5c6370;
+  --hljs-strong: #d19a66;
+  --hljs-emphasis: #d19a66;
+  --hljs-quote: #5c6370;
+  --hljs-literal: #d19a66;
+  --hljs-params: #e06c75;
+  --hljs-property: #56b6c2;
+  --hljs-variable: #d19a66;
+  --hljs-template-tag: #e06c75;
+  --hljs-template-variable: #d19a66;
 
   pre.hljs {
     background-color: var(--code-block-bg) !important;
