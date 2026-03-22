@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 应用开发平台原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .view { display: none; }
+        .view.active { display: flex; }
+        .nav-item.active { background-color: #f3f4f6; color: #2563eb; border-right: 3px solid #2563eb; }
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex overflow-hidden font-sans">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200">
+            <i class="fa-solid fa-cube text-blue-600 text-xl mr-3"></i>
+            <span class="text-lg font-bold text-gray-800">AI Platform</span>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li>
+                    <a href="#" onclick="switchView('chat', event)" class="nav-item active flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors" data-target="chat">
+                        <i class="fa-regular fa-comments w-6"></i>
+                        <span class="font-medium">AI 聊天</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchView('knowledge', event)" class="nav-item flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors" data-target="knowledge">
+                        <i class="fa-solid fa-book w-6"></i>
+                        <span class="font-medium">知识库 (RAG)</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchView('agent', event)" class="nav-item flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors" data-target="agent">
+                        <i class="fa-solid fa-robot w-6"></i>
+                        <span class="font-medium">Agent 工作台</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchView('stats', event)" class="nav-item flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors" data-target="stats">
+                        <i class="fa-solid fa-chart-line w-6"></i>
+                        <span class="font-medium">使用统计</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchView('settings', event)" class="nav-item flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors" data-target="settings">
+                        <i class="fa-solid fa-gear w-6"></i>
+                        <span class="font-medium">系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                    AD
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-700">Admin User</p>
+                    <p class="text-xs text-gray-500">admin@example.com</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Chat View -->
+        <div id="chat" class="view active flex-col h-full">
+            <!-- Header -->
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
+                <h2 class="text-xl font-semibold text-gray-800">AI 聊天</h2>
+                <div class="flex items-center">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option>deepseek-ai/DeepSeek-R1</option>
+                        <option>gpt-4-turbo</option>
+                        <option>claude-3-opus</option>
+                    </select>
+                </div>
+            </header>
+            
+            <!-- Chat History -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50">
+                <!-- User Message -->
+                <div class="flex justify-end">
+                    <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-5 py-3 max-w-2xl shadow-sm">
+                        <p>帮我写一段 React 的防抖 Hook</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 ml-3 flex-shrink-0 flex items-center justify-center mt-1">
+                        <i class="fa-solid fa-user text-gray-500 text-sm"></i>
+                    </div>
+                </div>
+                
+                <!-- AI Message -->
+                <div class="flex justify-start">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 mr-3 flex-shrink-0 flex items-center justify-center mt-1">
+                        <i class="fa-solid fa-robot text-blue-600 text-sm"></i>
+                    </div>
+                    <div class="bg-white border border-gray-200 text-gray-800 rounded-2xl rounded-tl-sm px-5 py-4 max-w-3xl shadow-sm">
+                        <p class="mb-3">没问题！这是一个常用的 React 防抖 Hook (<code>useDebounce</code>) 的实现：</p>
+                        <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto"><code>import { useState, useEffect } from 'react';
+
+export function useDebounce&lt;T&gt;(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState&lt;T&gt;(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+}</code></pre>
+                        <div class="mt-3 flex items-center text-xs text-gray-400 space-x-4">
+                            <span><i class="fa-regular fa-clock mr-1"></i> 14:32</span>
+                            <span><i class="fa-solid fa-bolt mr-1"></i> 145 tokens</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="p-4 bg-white border-t border-gray-200 shrink-0">
+                <div class="max-w-4xl mx-auto relative">
+                    <textarea rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-4 pr-24 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="输入消息，按 Enter 发送..."></textarea>
+                    <div class="absolute right-3 bottom-3 flex space-x-2">
+                        <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-200">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors flex items-center justify-center w-10 h-10">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-center mt-2 text-xs text-gray-400">
+                    内容由 AI 生成，请注意甄别。
+                </div>
+            </div>
+        </div>
+
+        <!-- Knowledge Base (RAG) View -->
+        <div id="knowledge" class="view flex-col h-full bg-gray-50 hidden">
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
+                <h2 class="text-xl font-semibold text-gray-800">知识库 (RAG)</h2>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center">
+                    <i class="fa-solid fa-upload mr-2"></i> 上传文档
+                </button>
+            </header>
+            
+            <div class="flex-1 overflow-y-auto p-6 flex gap-6">
+                <!-- Document List -->
+                <div class="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
+                        <h3 class="font-medium text-gray-800">文档列表 (company-docs)</h3>
+                        <div class="relative">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="搜索文档..." class="pl-9 pr-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-600">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3">文件名</th>
+                                    <th class="px-6 py-3">状态</th>
+                                    <th class="px-6 py-3">分块数</th>
+                                    <th class="px-6 py-3">大小</th>
+                                    <th class="px-6 py-3">上传时间</th>
+                                    <th class="px-6 py-3 text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 flex items-center">
+                                        <i class="fa-solid fa-file-pdf text-red-500 text-lg mr-3"></i>
+                                        <span class="font-medium text-gray-800 ml-2">员工手册_2026版.pdf</span>
+                                    </td>
+                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-800 text-xs px-2.5 py-0.5 rounded-full font-medium">已索引</span></td>
+                                    <td class="px-6 py-4">128</td>
+                                    <td class="px-6 py-4">2.4 MB</td>
+                                    <td class="px-6 py-4">2026-03-20</td>
+                                    <td class="px-6 py-4 text-right space-x-2">
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 flex items-center">
+                                        <i class="fa-solid fa-file-word text-blue-500 text-lg mr-3"></i>
+                                        <span class="font-medium text-gray-800 ml-2">退款政策及流程.docx</span>
+                                    </td>
+                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-800 text-xs px-2.5 py-0.5 rounded-full font-medium">已索引</span></td>
+                                    <td class="px-6 py-4">45</td>
+                                    <td class="px-6 py-4">1.1 MB</td>
+                                    <td class="px-6 py-4">2026-03-21</td>
+                                    <td class="px-6 py-4 text-right space-x-2">
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 flex items-center">
+                                        <i class="fa-solid fa-file-lines text-gray-500 text-lg mr-3"></i>
+                                        <span class="font-medium text-gray-800 ml-2">API对接说明.txt</span>
+                                    </td>
+                                    <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 text-xs px-2.5 py-0.5 rounded-full font-medium">处理中</span></td>
+                                    <td class="px-6 py-4">-</td>
+                                    <td class="px-6 py-4">45 KB</td>
+                                    <td class="px-6 py-4">10分钟前</td>
+                                    <td class="px-6 py-4 text-right space-x-2">
+                                        <button class="text-gray-400 cursor-not-allowed"><i class="fa-solid fa-eye"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RAG Test Panel -->
+                <div class="w-96 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col shrink-0">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+                        <h3 class="font-medium text-gray-800">检索测试</h3>
+                    </div>
+                    <div class="p-4 flex-1 overflow-y-auto space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">测试查询</label>
+                            <div class="flex">
+                                <input type="text" value="公司的退款政策是什么？" class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                <button class="bg-blue-600 text-white px-3 py-2 rounded-r-lg hover:bg-blue-700"><i class="fa-solid fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="border border-green-200 bg-green-50 rounded-lg p-4">
+                            <h4 class="text-sm font-semibold text-green-800 mb-2">生成回答</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">
+                                根据公司政策，退款需在购买后7天内申请。请将退款请求发送至 support@example.com，并附上订单号。财务部门将在3-5个工作日内处理退款。[1]
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">召回来源 (Top 2)</h4>
+                            <div class="space-y-2">
+                                <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-blue-600"><i class="fa-solid fa-file-word mr-1"></i> 退款政策及流程.docx</span>
+                                        <span class="text-xs text-gray-500 bg-white px-1.5 border rounded">Score: 0.92</span>
+                                    </div>
+                                    <p class="text-xs text-gray-600 line-clamp-3">
+                                        ...第三章 退款规定。3.1 凡在官方渠道购买产品的用户，均享有7天无理由退款权利。退款需在购买后7天内通过邮件申请，收件人为 support@example.com，邮件需包含完整订单号。3.2 财务部收到申请后，于3-5个工作日内原路退回款项...
+                                    </p>
+                                </div>
+                                <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-blue-600"><i class="fa-solid fa-file-pdf mr-1"></i> 员工手册_2026版.pdf</span>
+                                        <span class="text-xs text-gray-500 bg-white px-1.5 border rounded">Score: 0.75</span>
+                                    </div>
+                                    <p class="text-xs text-gray-600 line-clamp-3">
+                                        ...客服部门在处理用户客诉时，应首先安抚用户情绪。若涉及退款诉求，应引导用户查阅《退款政策》，并告知其7天内可通过支持邮箱发起正式申请流程...
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Workspace View -->
+        <div id="agent" class="view flex-col h-full bg-gray-50 hidden">
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
+                <h2 class="text-xl font-semibold text-gray-800">Agent 工作台</h2>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500">已启用工具:</span>
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md font-medium">Weather</span>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-md font-medium">Web Search</span>
+                    <button class="ml-2 text-gray-400 hover:text-blue-600"><i class="fa-solid fa-gear"></i></button>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                <!-- User Message -->
+                <div class="flex justify-end">
+                    <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-5 py-3 max-w-2xl shadow-sm">
+                        <p>帮我查询北京明天的天气，然后告诉我适合穿什么衣服。</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 ml-3 flex-shrink-0 flex items-center justify-center mt-1">
+                        <i class="fa-solid fa-user text-gray-500 text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- Agent Execution Steps -->
+                <div class="flex justify-start">
+                    <div class="w-8 h-8 rounded-full bg-purple-100 mr-3 flex-shrink-0 flex items-center justify-center mt-1 border border-purple-200">
+                        <i class="fa-solid fa-robot text-purple-600 text-sm"></i>
+                    </div>
+                    <div class="max-w-3xl space-y-3 w-full">
+                        
+                        <!-- Tool Call -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
+                            <div class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                <i class="fa-solid fa-wrench text-gray-400 mr-2"></i>
+                                调用工具: <code class="ml-1 text-pink-600 bg-pink-50 px-1.5 rounded">get_weather</code>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded border border-gray-100 text-xs font-mono text-gray-600 mb-2">
+                                {"city": "北京", "date": "2026-03-23"}
+                            </div>
+                            <div class="flex items-center text-xs text-green-600 font-medium">
+                                <i class="fa-solid fa-check-circle mr-1"></i> 执行成功
+                            </div>
+                            <div class="mt-2 bg-gray-800 text-green-400 p-2 rounded border border-gray-700 text-xs font-mono overflow-x-auto">
+                                {"city":"北京","temperature":15,"condition":"晴朗","forecast":"10-18°C"}
+                            </div>
+                        </div>
+
+                        <!-- Final Response -->
+                        <div class="bg-white border border-gray-200 text-gray-800 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm">
+                            <p>北京明天的天气晴朗，气温在 10-18°C 左右。</p>
+                            <p class="mt-2">根据这个天气，建议您：</p>
+                            <ul class="list-disc pl-5 mt-1 space-y-1">
+                                <li><strong>上装</strong>：穿一件长袖T恤或衬衫，外加一件薄外套或风衣。早晚较凉，中午较暖和，方便穿脱。</li>
+                                <li><strong>下装</strong>：长裤、牛仔裤或休闲裤都很合适。</li>
+                                <li><strong>其他</strong>：天气晴朗，白天紫外线可能较强，外出可以带上墨镜或涂抹防晒霜。</li>
+                            </ul>
+                            <div class="mt-3 flex items-center text-xs text-gray-400 space-x-4">
+                                <span><i class="fa-solid fa-stopwatch mr-1"></i> 耗时 2.4s</span>
+                                <span><i class="fa-solid fa-bolt mr-1"></i> 342 tokens</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 bg-white border-t border-gray-200 shrink-0">
+                <div class="max-w-4xl mx-auto relative">
+                    <textarea rows="2" class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-4 pr-16 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none" placeholder="输入任务给 Agent..."></textarea>
+                    <button class="absolute right-3 bottom-3 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg transition-colors flex items-center justify-center w-10 h-10">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics View -->
+        <div id="stats" class="view flex-col h-full bg-gray-50 hidden">
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center px-6 shrink-0">
+                <h2 class="text-xl font-semibold text-gray-800">使用统计</h2>
+            </header>
+            
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                <!-- Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                        <div class="text-sm font-medium text-gray-500 mb-1">总调用次数</div>
+                        <div class="text-3xl font-bold text-gray-800">12,450</div>
+                        <div class="text-xs text-green-500 mt-2 flex items-center"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +15% 较上周</div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                        <div class="text-sm font-medium text-gray-500 mb-1">总消耗 Tokens</div>
+                        <div class="text-3xl font-bold text-gray-800">8.4M</div>
+                        <div class="text-xs text-green-500 mt-2 flex items-center"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +5.2% 较上周</div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                        <div class="text-sm font-medium text-gray-500 mb-1">预估总成本</div>
+                        <div class="text-3xl font-bold text-gray-800">¥ 124.50</div>
+                        <div class="text-xs text-gray-400 mt-2">基于当前模型费率估算</div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                        <div class="text-sm font-medium text-gray-500 mb-1">活跃用户数</div>
+                        <div class="text-3xl font-bold text-gray-800">45</div>
+                        <div class="text-xs text-red-500 mt-2 flex items-center"><i class="fa-solid fa-arrow-trend-down mr-1"></i> -2 较上周</div>
+                    </div>
+                </div>
+
+                <!-- Charts Placeholder -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm h-80 flex flex-col">
+                        <h3 class="font-medium text-gray-800 mb-4">Token 消耗趋势 (近30天)</h3>
+                        <div class="flex-1 border border-dashed border-gray-300 rounded flex items-center justify-center bg-gray-50 text-gray-400">
+                            <div class="text-center">
+                                <i class="fa-solid fa-chart-area text-4xl mb-2"></i>
+                                <p class="mt-2">折线图占位</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm h-80 flex flex-col">
+                        <h3 class="font-medium text-gray-800 mb-4">模型使用占比</h3>
+                        <div class="flex-1 border border-dashed border-gray-300 rounded flex items-center justify-center bg-gray-50 text-gray-400">
+                            <div class="text-center">
+                                <i class="fa-solid fa-chart-pie text-4xl mb-2"></i>
+                                <p class="mt-2">饼图占位</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Usage Table -->
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="font-medium text-gray-800">最近使用记录</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-600">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3">时间</th>
+                                    <th class="px-6 py-3">用户</th>
+                                    <th class="px-6 py-3">模型</th>
+                                    <th class="px-6 py-3 text-right">Prompt Tokens</th>
+                                    <th class="px-6 py-3 text-right">Completion Tokens</th>
+                                    <th class="px-6 py-3 text-right">成本 (¥)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">2026-03-22 14:32:10</td>
+                                    <td class="px-6 py-4">admin@example.com</td>
+                                    <td class="px-6 py-4"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">deepseek-r1</span></td>
+                                    <td class="px-6 py-4 text-right">45</td>
+                                    <td class="px-6 py-4 text-right">145</td>
+                                    <td class="px-6 py-4 text-right">0.002</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">2026-03-22 14:15:22</td>
+                                    <td class="px-6 py-4">user1@example.com</td>
+                                    <td class="px-6 py-4"><span class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs">gpt-4-turbo</span></td>
+                                    <td class="px-6 py-4 text-right">120</td>
+                                    <td class="px-6 py-4 text-right">340</td>
+                                    <td class="px-6 py-4 text-right">0.045</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">2026-03-22 13:40:05</td>
+                                    <td class="px-6 py-4">admin@example.com</td>
+                                    <td class="px-6 py-4"><span class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs">text-embedding-3</span></td>
+                                    <td class="px-6 py-4 text-right">8,500</td>
+                                    <td class="px-6 py-4 text-right">0</td>
+                                    <td class="px-6 py-4 text-right">0.001</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settings" class="view flex-col h-full bg-gray-50 hidden">
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center px-6 shrink-0">
+                <h2 class="text-xl font-semibold text-gray-800">系统设置</h2>
+            </header>
+            
+            <div class="flex-1 overflow-y-auto p-6">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    
+                    <!-- API Keys -->
+                    <section class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+                            <h3 class="font-medium text-gray-800">API 密钥配置</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">OpenAI API Key</label>
+                                <input type="password" value="sk-xxxxxxxxxxxxxxxxxxxxxxxx" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">SiliconFlow API Key</label>
+                                <input type="password" value="sk-xxxxxxxxxxxxxxxxxxxxxxxx" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">SerpAPI Key (Web Search)</label>
+                                    <input type="password" placeholder="输入密钥" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">WeatherAPI Key</label>
+                                    <input type="password" placeholder="输入密钥" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">保存密钥设置</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- RAG Settings -->
+                    <section class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+                            <h3 class="font-medium text-gray-800">RAG 检索参数</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-3 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Chunk Size (分块大小)</label>
+                                    <input type="number" value="1000" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Chunk Overlap (重叠大小)</label>
+                                    <input type="number" value="200" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Top K (召回数量)</label>
+                                    <input type="number" value="5" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">RAG System Prompt</label>
+                                <textarea rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs">你是一个智能助手，请根据以下参考资料回答用户问题。
+如果参考资料中没有相关信息，请诚实告知用户。
+
+参考资料：
+{context}</textarea>
+                            </div>
+                            <div class="pt-2">
+                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">保存 RAG 设置</button>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function switchView(viewId, event) {
+            if (event) {
+                event.preventDefault();
+            }
+            // Hide all views
+            document.querySelectorAll('.view').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('hidden');
+            });
+            // Show target view
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('active');
+            }
+            
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+                el.classList.remove('bg-gray-50', 'text-blue-600');
+                el.style.borderRight = 'none';
+            });
+            // Set active nav item
+            const activeNav = document.querySelector(`.nav-item[data-target="${viewId}"]`);
+            if (activeNav) {
+                activeNav.classList.add('active');
+                activeNav.classList.add('bg-gray-50', 'text-blue-600');
+                activeNav.style.borderRight = '3px solid #2563eb';
+            }
+        }
+    </script>
+</body>
+</html>
